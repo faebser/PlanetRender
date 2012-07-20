@@ -24,5 +24,8 @@ class testApp : public ofBaseApp{
 		//ofImage_<ofPixels_<unsigned char> > map;
 		//GLUquadricObj *quadric;
 		ofTexture text;
+		ofPoint vertexPoints[10];
+		ofPoint center;
 		ofFbo fbo, fbo1, fbo2;
+		int res;
 };
