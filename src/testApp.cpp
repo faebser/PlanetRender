@@ -15,36 +15,58 @@ void testApp::setup(){
 	res = 10;
 
 	fbo.allocate(xMax, yMax, GL_RGBA, 4);
+	fbo3.allocate(xMax, yMax, GL_RGBA, 4);
+
+	fbo3.begin();
+		ofSetColor(255, 0, 0);
+		ofRect(0, 0, fbo3.getWidth(), fbo3.getHeight());
+		ofSetColor(255);
+		for(int i = 0; i < 20; i++) {
+			//ofTranslate(i * 20, i * fbo3.getWidth());
+			ofSetColor(255);
+			ofRect(fbo3.getRealXPos(i*fbo3.getWidth()), i*20, fbo3.getWidth(), 20);
+		}
+	fbo3.end();
 
 
 	//anderer planet
 	float angle = ofDegToRad(360/10);
 	for(int i = 0; i < 10; i++) {
-		float x = cos(angle * i) * 100;
-		float y = sin(angle * i) * 100;
+		float x = cos(angle * i) * 25;
+		float y = sin(angle * i) * 25;
 		vertexPoints[i] = ofPoint(x,y);
 	}
-	center.set(50,50);
+	center.set(12,12);
 
 	fbo.begin();
 		ofTranslate(fbo.getWidth() / 2, fbo.getHeight() / 2);
-		for (int r = 0; r < 20; r++) {
+		for (int r = 0; r < 10; r++) {
 			for(int i = 0; i < res; i++) {
-				vertexPoints[i].set(vertexPoints[i].x + ofRandom(-1, 3), vertexPoints[i].y + ofRandom(-1, 3));
+				vertexPoints[i].set(vertexPoints[i].x + ofRandom(-1, 1), vertexPoints[i].y + ofRandom(-1, 1));
 			}
 		}
+		ofSetColor(31, 94, 31, 255);
 		ofBeginShape();
 			ofCurveVertex(vertexPoints[res - 1]);
 			for(int i = 0; i < res; i++) {
 				ofCurveVertex(vertexPoints[i]);
-				ofSetColor(255, 0 ,0);
-				ofEllipse(vertexPoints[i], 5, 5);
-				ofSetColor(255, 255, 255);
+				//ofSetColor(255, 0 ,0);
+				//ofEllipse(vertexPoints[i], 5, 5);
 			}
 			ofCurveVertex(vertexPoints[1]);
 		ofEndShape();
-		ofSetColor(255, 0, 0);
-		ofEllipse(center, 5,5);
+		ofNoFill();
+		ofEnableSmoothing();
+			ofBeginShape();
+				ofCurveVertex(vertexPoints[res - 1]);
+				for(int i = 0; i < res; i++) {
+					ofCurveVertex(vertexPoints[i]);
+					//ofSetColor(255, 0 ,0);
+					//ofEllipse(vertexPoints[i], 5, 5);
+				}
+				ofCurveVertex(vertexPoints[1]);
+			ofEndShape();
+		ofDisableSmoothing();
 	fbo.end();
 
 	/*fbo1.allocate(xMax, yMax, GL_RGBA, 4);
@@ -132,6 +154,7 @@ void testApp::draw(){
 	ofSetColor(255);
 	//ofRect(0, 0, 1024, 768);
 	fbo.draw(0,0);
+	//fbo3.draw(0,0);
 
 	//fbo.draw(0,0);
 	//change origin to center
@@ -154,8 +177,11 @@ void testApp::draw(){
 	/*fbo2.getTextureReference().bind();
 	ofSphere(198);
 	fbo2.getTextureReference().unbind();*/
+	ofSetColor(7, 40, 124);
+	ofFill();
+	ofSphere(198);
 	fbo.getTextureReference().bind();
-	//ofSphere(200);
+	ofSphere(200);
 	fbo.getTextureReference().unbind();
 	/*fbo1.getTextureReference().bind();
 	ofSphere( 202);
@@ -177,29 +203,37 @@ void testApp::draw(){
 void testApp::keyPressed(int key){
 	if(key == 'a') {
 		fbo.begin();
-			ofSetColor(0);
-			ofRect(0,0, fbo.getWidth(), fbo.getHeight());
 			ofTranslate(fbo.getWidth() / 2, fbo.getHeight() / 2);
+			ofClear(255, 255, 255, 0);
 			//grow
-			ofSetColor(255);
 			for (int r = 0; r < 20; r++) {
 				for(int i = 0; i < res; i++) {
-					vertexPoints[i].set(vertexPoints[i].x + ofRandom(-3, 3), vertexPoints[i].y + ofRandom(-3, 3));
+					vertexPoints[i].set(vertexPoints[i].x + ofRandom(-1, 1), vertexPoints[i].y + ofRandom(-1, 1));
 				}
 			}
-			center.set(center.x + ofRandom(-3,3), center.y + ofRandom(-3, 3));
+			center.set(center.x + ofRandom(-3,3), center.y + ofRandom(-2, 2));
+			ofSetColor(31, 94, 31, 255);
 			ofBeginShape();
 				ofCurveVertex(vertexPoints[res - 1]);
 				for(int i = 0; i < res; i++) {
 					ofCurveVertex(vertexPoints[i]);
-					ofSetColor(255, 0 ,0);
-					ofEllipse(vertexPoints[i], 5, 5);
-					ofSetColor(255);
+					//ofSetColor(255, 0 ,0);
+					//ofEllipse(vertexPoints[i], 5, 5);
 				}
 				ofCurveVertex(vertexPoints[1]);
 			ofEndShape();
-			ofSetColor(255, 0, 0);
-			ofEllipse(center, 5,5);
+			ofNoFill();
+			ofEnableSmoothing();
+				ofBeginShape();
+					ofCurveVertex(vertexPoints[res - 1]);
+					for(int i = 0; i < res; i++) {
+						ofCurveVertex(vertexPoints[i]);
+						//ofSetColor(255, 0 ,0);
+						//ofEllipse(vertexPoints[i], 5, 5);
+					}
+					ofCurveVertex(vertexPoints[1]);
+				ofEndShape();
+			ofDisableSmoothing();
 		fbo.end();
 	}
 	else if(key == 's') {
