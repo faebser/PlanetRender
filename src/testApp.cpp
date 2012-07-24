@@ -45,7 +45,7 @@ void testApp::setup(){
 				vertexPoints[i].set(vertexPoints[i].x + ofRandom(-1, 1), vertexPoints[i].y + ofRandom(-1, 1));
 			}
 		}
-		ofSetColor(31, 94, 31, 255);
+		ofSetColor(66, 154, 66);
 		ofBeginShape();
 			ofCurveVertex(vertexPoints[res - 1]);
 			for(int i = 0; i < res; i++) {
@@ -69,6 +69,15 @@ void testApp::setup(){
 		ofDisableSmoothing();
 	fbo.end();
 
+	// Point lights emit light in all directions //
+	// set the diffuse color, color reflected from the light source //
+	pointLight.setDiffuseColor( ofColor(249, 245, 224));
+	lightPos = ofVec3f(800, 34, 545);
+	pointLight.setPosition(lightPos);
+
+	// specular color, the highlight/shininess color //
+	pointLight.setSpecularColor( ofColor(255.f, 255.f, 0.f));
+	pointLight.setPointLight();
 	/*fbo1.allocate(xMax, yMax, GL_RGBA, 4);
 	fbo2.allocate(xMax, yMax, GL_RGBA, 4);
 	//map.allocate(2048, 1024, OF_IMAGE_GRAYSCALE);
@@ -151,6 +160,11 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
+
+
+	ofEnableLighting();
+	pointLight.enable();
+
 	ofSetColor(255);
 	//ofRect(0, 0, 1024, 768);
 	fbo.draw(0,0);
@@ -258,7 +272,36 @@ void testApp::keyPressed(int key){
 		xIncrement -= 0.0001;
 		cout << ofToString(xIncrement) << endl;
 	}
-
+	else if (key == OF_KEY_UP) {
+		lightPos.x++;
+		pointLight.setPosition(lightPos);
+		cout << "x-> " << lightPos.x << " y-> " << lightPos.y << " z-> " << lightPos.z << endl;
+	}
+	else if (key == OF_KEY_DOWN) {
+		lightPos.x--;
+		pointLight.setPosition(lightPos);
+		cout << "x-> " << lightPos.x << " y-> " << lightPos.y << " z-> " << lightPos.z << endl;
+	}
+	else if (key == OF_KEY_LEFT) {
+		lightPos.y++;
+		pointLight.setPosition(lightPos);
+		cout << "x-> " << lightPos.x << " y-> " << lightPos.y << " z-> " << lightPos.z << endl;
+	}
+	else if (key == OF_KEY_RIGHT) {
+		lightPos.y--;
+		pointLight.setPosition(lightPos);
+		cout << "x-> " << lightPos.x << " y-> " << lightPos.y << " z-> " << lightPos.z << endl;
+	}
+	else if (key == 'o') {
+		lightPos.z++;
+		pointLight.setPosition(lightPos);
+		cout << "x-> " << lightPos.x << " y-> " << lightPos.y << " z-> " << lightPos.z << endl;
+	}
+	else if (key == 'l') {
+		lightPos.z--;
+		pointLight.setPosition(lightPos);
+		cout << "x-> " << lightPos.x << " y-> " << lightPos.y << " z-> " << lightPos.z << endl;
+	}
 }
 
 //--------------------------------------------------------------
