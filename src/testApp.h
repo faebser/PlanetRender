@@ -1,7 +1,8 @@
 #pragma once
-#define POINTS 10
-#define RADIUS 50
+#define POINTS 6
+#define RADIUS 250
 #define GROWRATE 20
+#define UPDATERATE 100
 #include "ofMain.h"
 
 class planetShape {
@@ -16,29 +17,16 @@ class planetShape {
 					vertexPoints[i] = newPoint;
 					this->size = size;
 			}
+			for(int i = 0; i <= size; i++) {
+				growMe();
+			}
 		}
 		void updatePoints() {
-			for(int i = 0; i < POINTS; i++) {
-				vertexPoints[i].set(vertexPoints[i].x + ofRandom(-1, 1), vertexPoints[i].y + ofRandom(-1, 1));
-			}
-			center.set(center.x + ofRandom(-1.5,1.5), center.y + ofRandom(-1.5, 1.5));
-		}
-		void grow() {
-			for (int r = 0; r < GROWRATE; r++) {
+			for (int change = 0; change < UPDATERATE; change++) {
 				for(int i = 0; i < POINTS; i++) {
-					ofPoint growVec;
-					growVec =  vertexPoints[i] - center;
-					vertexPoints[i] += growVec.normalized()*0.5;
+					vertexPoints[i].set(vertexPoints[i].x + ofRandom(-3, 3), vertexPoints[i].y + ofRandom(-3, 3));
 				}
-			}
-		}
-		void shrink() {
-			for (int r = 0; r < GROWRATE; r++) {
-				for(int i = 0; i < POINTS; i++) {
-					ofPoint growVec;
-					growVec =  vertexPoints[i] - center;
-					vertexPoints[i] -= growVec.normalized()*0.5;
-				}
+				center.set(center.x + ofRandom(-3.5,3.5), center.y + ofRandom(-3.5, 3.5));
 			}
 		}
 		ofVec2f getCenter() const {
@@ -47,7 +35,18 @@ class planetShape {
 		void setCenter(ofVec2f center) {
 			this->center = center;
 		}
-
+		void grow(int newSize) {
+			int change  = newSize - size;
+			for(int i = 0; i <= change; i++) {
+				growMe();
+			}
+		}
+		void shrink(int newSize) {
+			int change  = size - newSize;
+			for(int i = 0; i <= change; i++) {
+				growMe();
+			}
+		}
 		const ofVec2f* getvertexPoints() const {
 			return vertexPoints;
 		}
@@ -69,6 +68,24 @@ class planetShape {
 		ofVec2f pos, center;
 		ofVec2f vertexPoints[POINTS];
 		float size;
+		void growMe() {
+			for (int r = 0; r < GROWRATE; r++) {
+				for(int i = 0; i < POINTS; i++) {
+					ofPoint growVec;
+					growVec =  vertexPoints[i] - center;
+					vertexPoints[i] += growVec.normalized()*0.5;
+				}
+			}
+		}
+		void shrinkMe() {
+			for (int r = 0; r < GROWRATE; r++) {
+				for(int i = 0; i < POINTS; i++) {
+					ofPoint growVec;
+					growVec =  vertexPoints[i] - center;
+					vertexPoints[i] -= growVec.normalized()*0.5;
+				}
+			}
+		}
 };
 
 class planetFbo : public ofFbo {
@@ -114,31 +131,41 @@ class planetFbo : public ofFbo {
 			updatePoints();
 			generateAttraction();
 			this->begin();
+			ofClear(0, 0, 0, 0);
 			for(;it < end; ++it) {
-				const ofVec2f* vertexPoints = it->getvertexPoints();
-				ofBeginShape();
-				ofCurveVertex(vertexPoints[POINTS - 1].x, vertexPoints[POINTS - 1].y);
-					for(int i = 0; i < POINTS; i++) {
-						ofCurveVertex(vertexPoints[i].x, vertexPoints[i].y);
-					}
-					ofCurveVertex(vertexPoints[1].x, vertexPoints[1].y);
-				ofEndShape();
-				ofNoFill();
-				ofEnableSmoothing();
+				ofPushStyle();
+					ofSetColor(66, 154, 66);
+					ofFill();
+					const ofVec2f* vertexPoints = it->getvertexPoints();
 					ofBeginShape();
-						ofCurveVertex(vertexPoints[POINTS - 1].x, vertexPoints[POINTS - 1].y);
+					ofVertex(getRealXPos(vertexPoints[POINTS - 1].x), vertexPoints[POINTS - 1].y);
 						for(int i = 0; i < POINTS; i++) {
-							ofCurveVertex(vertexPoints[i].x, vertexPoints[i].y);
+							ofVertex(getRealXPos(vertexPoints[i].x), vertexPoints[i].y);
 						}
-						ofCurveVertex(vertexPoints[1].x, vertexPoints[1].y);
+						ofVertex(getRealXPos(vertexPoints[1].x), vertexPoints[1].y);
 					ofEndShape();
-				ofDisableSmoothing();
+					ofNoFill();
+					ofEnableSmoothing();
+						ofBeginShape();
+							ofVertex(getRealXPos(vertexPoints[POINTS - 1].x), vertexPoints[POINTS - 1].y);
+							for(int i = 0; i < POINTS; i++) {
+								ofVertex(getRealXPos(vertexPoints[i].x), vertexPoints[i].y);
+							}
+							ofVertex(getRealXPos(vertexPoints[1].x), vertexPoints[1].y);
+						ofEndShape();
+					ofDisableSmoothing();
+				ofPopStyle();
 			}
 			this->end();
 		}
 		void generateShapes(int size) {
 			if(size > 5) {
-				//int firstSize =
+				float left = size - ofRandom(size * 0.25,size);
+				shapes.push_back(planetShape(getWidth(), getHeight(), left));
+				generateShapes(left);
+			}
+			else {
+				shapes.push_back(planetShape(getWidth(), getHeight(), size));
 			}
 		}
 	private:

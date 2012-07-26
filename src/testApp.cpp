@@ -10,23 +10,26 @@ void testApp::setup(){
 	earth.loadImage("earth.jpg");
 	//text = earth.getTextureReference();
 
-	int xMax = 800;
-	int yMax = 600;
+	int xMax = 1024;
+	int yMax = 768;
 	res = 10;
 
 	fbo.allocate(xMax, yMax, GL_RGBA, 4);
 	fbo3.allocate(xMax, yMax, GL_RGBA, 4);
+	fbo3.generateShapes(20);
+	fbo3.paintMe();
 
-	fbo3.begin();
-		ofSetColor(255, 0, 0);
-		ofRect(0, 0, fbo3.getWidth(), fbo3.getHeight());
-		ofSetColor(255);
-		for(int i = 0; i < 20; i++) {
-			//ofTranslate(i * 20, i * fbo3.getWidth());
-			ofSetColor(255);
-			ofRect(fbo3.getRealXPos(i*fbo3.getWidth()), i*20, fbo3.getWidth(), 20);
-		}
-	fbo3.end();
+
+//	fbo3.begin();
+//		//ofSetColor(255, 0, 0);
+//		ofRect(0, 0, fbo3.getWidth(), fbo3.getHeight());
+//		//ofSetColor(255);
+//		for(int i = 0; i < 20; i++) {
+//			//ofTranslate(i * 20, i * fbo3.getWidth());
+//			//ofSetColor(255);
+//			ofRect(fbo3.getRealXPos(i*fbo3.getWidth()), i*20, fbo3.getWidth(), 20);
+//		}
+//	fbo3.end();
 
 
 	//anderer planet
@@ -167,7 +170,7 @@ void testApp::draw(){
 
 	ofSetColor(255);
 	//ofRect(0, 0, 1024, 768);
-	fbo.draw(0,0);
+	fbo3.draw(0,0);
 	//fbo3.draw(0,0);
 
 	//fbo.draw(0,0);
@@ -194,9 +197,9 @@ void testApp::draw(){
 	ofSetColor(7, 40, 124);
 	ofFill();
 	ofSphere(198);
-	fbo.getTextureReference().bind();
-	ofSphere(200);
-	fbo.getTextureReference().unbind();
+	fbo3.getTextureReference().bind();
+	ofSphere(201);
+	fbo3.getTextureReference().unbind();
 	/*fbo1.getTextureReference().bind();
 	ofSphere( 202);
 	fbo1.getTextureReference().unbind();*/
@@ -216,39 +219,40 @@ void testApp::draw(){
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
 	if(key == 'a') {
-		fbo.begin();
-			ofTranslate(fbo.getWidth() / 2, fbo.getHeight() / 2);
-			ofClear(255, 255, 255, 0);
-			//grow
-			for (int r = 0; r < 20; r++) {
-				for(int i = 0; i < res; i++) {
-					vertexPoints[i].set(vertexPoints[i].x + ofRandom(-1, 1), vertexPoints[i].y + ofRandom(-1, 1));
-				}
-			}
-			center.set(center.x + ofRandom(-3,3), center.y + ofRandom(-2, 2));
-			ofSetColor(31, 94, 31, 255);
-			ofBeginShape();
-				ofCurveVertex(vertexPoints[res - 1]);
-				for(int i = 0; i < res; i++) {
-					ofCurveVertex(vertexPoints[i]);
-					//ofSetColor(255, 0 ,0);
-					//ofEllipse(vertexPoints[i], 5, 5);
-				}
-				ofCurveVertex(vertexPoints[1]);
-			ofEndShape();
-			ofNoFill();
-			ofEnableSmoothing();
-				ofBeginShape();
-					ofCurveVertex(vertexPoints[res - 1]);
-					for(int i = 0; i < res; i++) {
-						ofCurveVertex(vertexPoints[i]);
-						//ofSetColor(255, 0 ,0);
-						//ofEllipse(vertexPoints[i], 5, 5);
-					}
-					ofCurveVertex(vertexPoints[1]);
-				ofEndShape();
-			ofDisableSmoothing();
-		fbo.end();
+		fbo3.paintMe();
+//		fbo.begin();
+//			ofTranslate(fbo.getWidth() / 2, fbo.getHeight() / 2);
+//			ofClear(255, 255, 255, 0);
+//			//grow
+//			for (int r = 0; r < 20; r++) {
+//				for(int i = 0; i < res; i++) {
+//					vertexPoints[i].set(vertexPoints[i].x + ofRandom(-1, 1), vertexPoints[i].y + ofRandom(-1, 1));
+//				}
+//			}
+//			center.set(center.x + ofRandom(-3,3), center.y + ofRandom(-2, 2));
+//			ofSetColor(31, 94, 31, 255);
+//			ofBeginShape();
+//				ofCurveVertex(vertexPoints[res - 1]);
+//				for(int i = 0; i < res; i++) {
+//					ofCurveVertex(vertexPoints[i]);
+//					//ofSetColor(255, 0 ,0);
+//					//ofEllipse(vertexPoints[i], 5, 5);
+//				}
+//				ofCurveVertex(vertexPoints[1]);
+//			ofEndShape();
+//			ofNoFill();
+//			ofEnableSmoothing();
+//				ofBeginShape();
+//					ofCurveVertex(vertexPoints[res - 1]);
+//					for(int i = 0; i < res; i++) {
+//						ofCurveVertex(vertexPoints[i]);
+//						//ofSetColor(255, 0 ,0);
+//						//ofEllipse(vertexPoints[i], 5, 5);
+//					}
+//					ofCurveVertex(vertexPoints[1]);
+//				ofEndShape();
+//			ofDisableSmoothing();
+//		fbo.end();
 	}
 	else if(key == 's') {
 		for (int r = 0; r < 20; r++) {
