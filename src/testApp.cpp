@@ -16,7 +16,14 @@ void testApp::setup(){
 
 	fbo.allocate(xMax, yMax, GL_RGBA, 4);
 	fbo3.allocate(xMax, yMax, GL_RGBA, 4);
+	fbo4.allocate(xMax, yMax, GL_RGBA, 4);
+	fbo4.setType("line");
+	fbo3.setType("line");
+	fbo4.setColor(ofColor(0, 255, 56));
+	fbo3.setColor(ofColor(255, 141, 68));
+	fbo4.generateShapes(20);
 	fbo3.generateShapes(20);
+	fbo4.paintMe();
 	fbo3.paintMe();
 
 
@@ -171,6 +178,7 @@ void testApp::draw(){
 	ofSetColor(255);
 	//ofRect(0, 0, 1024, 768);
 	fbo3.draw(0,0);
+	fbo4.draw(0,0);
 	//fbo3.draw(0,0);
 
 	//fbo.draw(0,0);
@@ -178,7 +186,7 @@ void testApp::draw(){
 	ofTranslate(ofGetWidth()/2, ofGetHeight()/2, 0);
 
 	//rotate sphere over time
-	ofRotateY(ofGetFrameNum()*0.1);
+	ofRotateY(ofGetFrameNum()*1); // super idee das mached mir so :D
 	//ofRotateX(); //north pole facing up
 	ofEnableAlphaBlending();
 	glEnable(GL_DEPTH_TEST); //enable depth comparisons and update the depth buffer
@@ -194,12 +202,18 @@ void testApp::draw(){
 	/*fbo2.getTextureReference().bind();
 	ofSphere(198);
 	fbo2.getTextureReference().unbind();*/
-	ofSetColor(7, 40, 124);
+	ofSetColor(184, 114, 32);
 	ofFill();
 	ofSphere(198);
+	ofSetColor(255); // IMPORTANT!!!
 	fbo3.getTextureReference().bind();
 	ofSphere(201);
 	fbo3.getTextureReference().unbind();
+	ofSetColor(255);
+	fbo4.getTextureReference().bind();
+	ofRotateY(90);
+	ofSphere(203);
+	fbo4.getTextureReference().unbind();
 	/*fbo1.getTextureReference().bind();
 	ofSphere( 202);
 	fbo1.getTextureReference().unbind();*/

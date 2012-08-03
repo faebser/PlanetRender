@@ -3,22 +3,36 @@
 #define RADIUS 250
 #define GROWRATE 20
 #define UPDATERATE 100
+#define ALPHA 128
 #include "ofMain.h"
 
 class planetShape {
 	public:
-		planetShape(float width, float height, float size) {
-			center = ofVec2f(ofRandom(0, width), ofRandom(0, height));
-			float angle = ofDegToRad(360 / POINTS);
-			for(int i = 0; i < POINTS; i++) {
-					float x = cos(angle * i) * 25;
-					float y = sin(angle * i) * 25;
-					ofVec2f newPoint = ofVec2f(x,y) + center;
-					vertexPoints[i] = newPoint;
-					this->size = size;
+		planetShape(float width, float height, float size, string type) {
+			if(type == "shape") {
+				center = ofVec2f(ofRandom(0, width), ofRandom(0, height));
+				float angle = ofDegToRad(360 / POINTS);
+				for(int i = 0; i < POINTS; i++) {
+						float x = cos(angle * i) * 25;
+						float y = sin(angle * i) * 25;
+						ofVec2f newPoint = ofVec2f(x,y) + center;
+						vertexPoints[i] = newPoint;
+						this->size = size;
+						for(int i = 0; i <= size; i++) {
+							growMe();
+						}
+				}
 			}
-			for(int i = 0; i <= size; i++) {
-				growMe();
+			else if(type == "line") {
+				float step = (float)1 / (POINTS/2);
+				ofVec2f start = ofVec2f(0, ofRandom(0, height));
+				ofVec2f end = ofVec2f(width, start.y);
+				vertexPoints[0] = start;
+				for(int i = 1; i < POINTS-1; i++) {
+					ofVec2f newPoint = start.interpolate(end, step);
+					vertexPoints[i] = newPoint;
+				}
+				vertexPoints[POINTS-1] = end;
 			}
 		}
 		void updatePoints() {
@@ -27,6 +41,13 @@ class planetShape {
 					vertexPoints[i].set(vertexPoints[i].x + ofRandom(-3, 3), vertexPoints[i].y + ofRandom(-3, 3));
 				}
 				center.set(center.x + ofRandom(-3.5,3.5), center.y + ofRandom(-3.5, 3.5));
+			}
+		}
+		void updateLines() {
+			for (int change = 0; change < UPDATERATE; change++) {
+				for(int i = 0; i < POINTS; i++) {
+					vertexPoints[i].set(vertexPoints[i].x, vertexPoints[i].y + ofRandom(-3, 3));
+				}
 			}
 		}
 		ofVec2f getCenter() const {
@@ -44,7 +65,7 @@ class planetShape {
 		void shrink(int newSize) {
 			int change  = size - newSize;
 			for(int i = 0; i <= change; i++) {
-				growMe();
+				shrinkMe()();
 			}
 		}
 		const ofVec2f* getvertexPoints() const {
@@ -100,8 +121,15 @@ class planetFbo : public ofFbo {
 		}
 		void updatePoints() {
 			vector<planetShape>::iterator it = shapes.begin(), end = shapes.end();
-			for (; it < end; it++) {
-				it->updatePoints();
+			if(type == "shape") {
+				for (; it < end; it++) {
+					it->updatePoints();
+				}
+			}
+			else if(type == "line") {
+				for (; it < end; it++) {
+					it->updateLines();
+				}
 			}
 		}
 		void generateAttraction() {
@@ -127,6 +155,14 @@ class planetFbo : public ofFbo {
 			}
 		}
 		void paintMe() {
+			if (type == "shape") {
+				paintMeShapes();
+			}
+			else if(type == "line") {
+				paintMeLines();
+			}
+		}
+		void paintMeShapes() {
 			vector<planetShape>::iterator it = shapes.begin(), end = shapes.end();
 			updatePoints();
 			generateAttraction();
@@ -158,18 +194,77 @@ class planetFbo : public ofFbo {
 			}
 			this->end();
 		}
+		void paintMeLines() {
+			vector<planetShape>::iterator it = shapes.begin(), end = shapes.end();
+			ofSetColor(255);
+			ofClear(0,0,0,0);
+			updatePoints();
+			this->begin();
+			for(;it < end; ++it) {
+				ofPushStyle();
+				ofPushMatrix();
+					const ofVec2f* vertexPoints = it->getvertexPoints();
+					float randomX = 0;
+					if(ofRandom(1) > 0.5) {
+						randomX = ofRandom(-10, this->getWidth()-vertexPoints[POINTS-2].x);
+					}
+					else {
+						randomX = ofRandom(-10, vertexPoints[1].x)*-1;
+					}
+					ofTranslate(randomX, 0);
+					ofEnableSmoothing();
+					ofSetColor(color);
+					ofBeginShape();
+						for(int i = 0; i < POINTS; i++) {
+							ofCurveVertex(vertexPoints[i].x, vertexPoints[i].y);
+						}
+					ofEndShape();
+					ofDisableSmoothing();
+				ofPopMatrix();
+				ofPopStyle();
+			}
+			this->end();
+		}
 		void generateShapes(int size) {
-			if(size > 5) {
-				float left = size - ofRandom(size * 0.25,size);
-				shapes.push_back(planetShape(getWidth(), getHeight(), left));
-				generateShapes(left);
+			if(type == "shape") {
+				if(size > 5) {
+					float left = size - ofRandom(size * 0.25,size);
+					shapes.push_back(planetShape(getWidth(), getHeight(), left, type));
+					generateShapes(left);
+				}
+				else {
+					shapes.push_back(planetShape(getWidth(), getHeight(), size, type));
+				}
 			}
-			else {
-				shapes.push_back(planetShape(getWidth(), getHeight(), size));
+			else if(type == "line") {
+				for(int i = 0; i < size; i++) {
+					shapes.push_back(planetShape(getWidth(), getHeight(), size, type));
+				}
 			}
+		}
+		string getType() const {
+			return type;
+		}
+
+		void setType(string type) {
+			this->type = type;
+		}
+		ofColor getColor() const {
+			return color;
+		}
+		ofColor getColorWithMaxAlpha() const {
+			return colorWithMaxAlpha;
+		}
+		void setColor(ofColor color) {
+			this->color = color;
+			this->colorWithMaxAlpha = color;
+			this->colorWithMaxAlpha.a = 255;
+			this->color.a = ALPHA;
 		}
 	private:
 		vector<planetShape> shapes;
+		string type;
+		ofColor colorWithMaxAlpha, color;
 };
 
 
@@ -198,7 +293,7 @@ class testApp : public ofBaseApp{
 		ofPoint vertexPoints[10];
 		ofPoint center;
 		ofFbo fbo, fbo1, fbo2;
-		planetFbo fbo3;
+		planetFbo fbo3, fbo4;
 		int res;
 		ofLight pointLight;
 		ofVec3f lightPos;
