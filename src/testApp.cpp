@@ -7,14 +7,14 @@ void testApp::setup(){
 	ofSetFrameRate(60);
 	ofSetVerticalSync(true);
 	ofDisableArbTex(); //needed for textures to work with gluSphere
-	earth.loadImage("earth.jpg");
+	//earth.loadImage("earth.jpg");
 	//text = earth.getTextureReference();
 
 	int xMax = 1024;
 	int yMax = 768;
 	res = 10;
 
-	fbo.allocate(xMax, yMax, GL_RGBA, 4);
+	//fbo.allocate(xMax, yMax, GL_RGBA, 4);
 	fbo3.allocate(xMax, yMax, GL_RGBA, 4);
 	fbo4.allocate(xMax, yMax, GL_RGBA, 4);
 	fbo4.setType("line");
@@ -48,7 +48,7 @@ void testApp::setup(){
 	}
 	center.set(12,12);
 
-	fbo.begin();
+	/*fbo.begin();
 		ofTranslate(fbo.getWidth() / 2, fbo.getHeight() / 2);
 		for (int r = 0; r < 10; r++) {
 			for(int i = 0; i < res; i++) {
@@ -77,7 +77,7 @@ void testApp::setup(){
 				ofCurveVertex(vertexPoints[1]);
 			ofEndShape();
 		ofDisableSmoothing();
-	fbo.end();
+	fbo.end();*/
 
 	// Point lights emit light in all directions //
 	// set the diffuse color, color reflected from the light source //
@@ -175,60 +175,48 @@ void testApp::draw(){
 	ofEnableLighting();
 	pointLight.enable();
 
-	ofSetColor(255);
+	//ofSetColor(255);
 	//ofRect(0, 0, 1024, 768);
-	fbo3.draw(0,0);
+	//fbo3.draw(0,0);
 	fbo4.draw(0,0);
 	//fbo3.draw(0,0);
 
-	//fbo.draw(0,0);
 	//change origin to center
 	ofTranslate(ofGetWidth()/2, ofGetHeight()/2, 0);
 
 	//rotate sphere over time
-	ofRotateY(ofGetFrameNum()*1); // super idee das mached mir so :D
-	//ofRotateX(); //north pole facing up
+	ofRotateY(ofGetFrameNum()*0.1); // super idee das mached mir so :D
 	ofEnableAlphaBlending();
 	glEnable(GL_DEPTH_TEST); //enable depth comparisons and update the depth buffer
 
 	//bind and draw texture
-	//texta.draw(0,0);
-	//ofSetColor(181, 133, 85);
-	//ofSphere(195);
 	glMatrixMode(GL_TEXTURE);
 	glPushMatrix();
-	ofScale(fbo.getWidth(), fbo.getHeight());
+	ofScale(fbo3.getWidth(), fbo3.getHeight());
 	glMatrixMode(GL_MODELVIEW);
-	/*fbo2.getTextureReference().bind();
-	ofSphere(198);
-	fbo2.getTextureReference().unbind();*/
 	ofSetColor(184, 114, 32);
 	ofFill();
 	ofSphere(198);
 	ofSetColor(255); // IMPORTANT!!!
 	fbo3.getTextureReference().bind();
-	ofSphere(201);
+	ofSphere(200);
 	fbo3.getTextureReference().unbind();
 	ofSetColor(255);
 	fbo4.getTextureReference().bind();
 	ofRotateY(90);
-	ofSphere(203);
+	ofSphere(206);
 	fbo4.getTextureReference().unbind();
-	/*fbo1.getTextureReference().bind();
-	ofSphere( 202);
-	fbo1.getTextureReference().unbind();*/
 	glMatrixMode(GL_TEXTURE);
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
 	//fbo.draw(0,0);
 	glDisable(GL_DEPTH_TEST);
 	ofDisableAlphaBlending();
-	/*ofEnableAlphaBlending();
-	ofSetColor(255, 0, 0, 75);
-	ofRect(100, 100, 150, 150);
-	ofSetColor(0, 255, 0, 128);
-	ofRect(200, 200, 150, 150);
-	ofDisableAlphaBlending();*/
+	ofDisableLighting();
+	/*ofImage screen;
+	screen.grabScreen(0,0,ofGetWindowWidth(), ofGetWindowHeight());
+	screen.saveImage("test_" + ofToString(ofGetFrameNum()) + ".png");
+	cout << "saved " << "test_" << ofToString(ofGetFrameNum()) << ".png" << endl;*/
 }
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){

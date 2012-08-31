@@ -65,7 +65,7 @@ class planetShape {
 		void shrink(int newSize) {
 			int change  = size - newSize;
 			for(int i = 0; i <= change; i++) {
-				shrinkMe()();
+				shrinkMe();
 			}
 		}
 		const ofVec2f* getvertexPoints() const {
@@ -287,12 +287,9 @@ class testApp : public ofBaseApp{
 		ofImage earth;
 		float yIncrement, xIncrement;
 		int* brighntess;
-		//ofImage_<ofPixels_<unsigned char> > map;
-		//GLUquadricObj *quadric;
 		ofTexture text;
 		ofPoint vertexPoints[10];
 		ofPoint center;
-		ofFbo fbo, fbo1, fbo2;
 		planetFbo fbo3, fbo4;
 		int res;
 		ofLight pointLight;
