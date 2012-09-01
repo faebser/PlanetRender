@@ -294,4 +294,5 @@ class testApp : public ofBaseApp{
 		int res;
 		ofLight pointLight;
 		ofVec3f lightPos;
+		vector<ofVec3f> stars;
 };

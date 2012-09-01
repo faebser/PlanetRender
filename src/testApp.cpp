@@ -1,20 +1,18 @@
 #include "testApp.h"
+#define AMOUNT 100
 
 //--------------------------------------------------------------
 void testApp::setup(){
 	ofBackground(0,0,0);
 
-	ofSetFrameRate(60);
+	ofSetFrameRate(24);
 	ofSetVerticalSync(true);
 	ofDisableArbTex(); //needed for textures to work with gluSphere
-	//earth.loadImage("earth.jpg");
-	//text = earth.getTextureReference();
 
 	int xMax = 1024;
 	int yMax = 768;
 	res = 10;
 
-	//fbo.allocate(xMax, yMax, GL_RGBA, 4);
 	fbo3.allocate(xMax, yMax, GL_RGBA, 4);
 	fbo4.allocate(xMax, yMax, GL_RGBA, 4);
 	fbo4.setType("line");
@@ -26,18 +24,26 @@ void testApp::setup(){
 	fbo4.paintMe();
 	fbo3.paintMe();
 
+	float x = 1, y = 1;
+	for(int i = 0; i < 100; i++) {
+		x = x + ofGetWindowWidth() / 9;
+		if(i % 11 == 0) {
+			y = y + ofGetWindowHeight() / 9;
+			x = 10;
+		}
+		stars.push_back(ofVec3f(x, y, ofRandom(0.8, 1)));
+	}
 
-//	fbo3.begin();
-//		//ofSetColor(255, 0, 0);
-//		ofRect(0, 0, fbo3.getWidth(), fbo3.getHeight());
-//		//ofSetColor(255);
-//		for(int i = 0; i < 20; i++) {
-//			//ofTranslate(i * 20, i * fbo3.getWidth());
-//			//ofSetColor(255);
-//			ofRect(fbo3.getRealXPos(i*fbo3.getWidth()), i*20, fbo3.getWidth(), 20);
-//		}
-//	fbo3.end();
-
+	vector<ofVec3f>::iterator it = stars.begin(), end = stars.end();
+	ofSetColor(255);
+	int rounds = 1000;
+	for(int i = 0; i < rounds; i++) {
+		for(; it != end; ++it) {
+			it->set(it->x + ofRandom(-1.,1.), it->y + ofRandom(-1.1,1.1), 0);
+			ofCircle((*it), 1);
+		}
+		it = stars.begin();
+	}
 
 	//anderer planet
 	float angle = ofDegToRad(360/10);
@@ -47,37 +53,6 @@ void testApp::setup(){
 		vertexPoints[i] = ofPoint(x,y);
 	}
 	center.set(12,12);
-
-	/*fbo.begin();
-		ofTranslate(fbo.getWidth() / 2, fbo.getHeight() / 2);
-		for (int r = 0; r < 10; r++) {
-			for(int i = 0; i < res; i++) {
-				vertexPoints[i].set(vertexPoints[i].x + ofRandom(-1, 1), vertexPoints[i].y + ofRandom(-1, 1));
-			}
-		}
-		ofSetColor(66, 154, 66);
-		ofBeginShape();
-			ofCurveVertex(vertexPoints[res - 1]);
-			for(int i = 0; i < res; i++) {
-				ofCurveVertex(vertexPoints[i]);
-				//ofSetColor(255, 0 ,0);
-				//ofEllipse(vertexPoints[i], 5, 5);
-			}
-			ofCurveVertex(vertexPoints[1]);
-		ofEndShape();
-		ofNoFill();
-		ofEnableSmoothing();
-			ofBeginShape();
-				ofCurveVertex(vertexPoints[res - 1]);
-				for(int i = 0; i < res; i++) {
-					ofCurveVertex(vertexPoints[i]);
-					//ofSetColor(255, 0 ,0);
-					//ofEllipse(vertexPoints[i], 5, 5);
-				}
-				ofCurveVertex(vertexPoints[1]);
-			ofEndShape();
-		ofDisableSmoothing();
-	fbo.end();*/
 
 	// Point lights emit light in all directions //
 	// set the diffuse color, color reflected from the light source //
@@ -170,16 +145,16 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
+	vector<ofVec3f>::iterator it = stars.begin(), end = stars.end();
+	ofSetColor(255);
+	for(; it != end; ++it) {
+		it->set(it->x + ofRandom(-0.01,0.01), it->y + ofRandom(-0.01,0.01), 0);
+		ofCircle((*it), 0.8);
+	}
 
-
+	fbo3.draw(0, 0);
 	ofEnableLighting();
 	pointLight.enable();
-
-	//ofSetColor(255);
-	//ofRect(0, 0, 1024, 768);
-	//fbo3.draw(0,0);
-	fbo4.draw(0,0);
-	//fbo3.draw(0,0);
 
 	//change origin to center
 	ofTranslate(ofGetWidth()/2, ofGetHeight()/2, 0);
@@ -215,8 +190,15 @@ void testApp::draw(){
 	ofDisableLighting();
 	/*ofImage screen;
 	screen.grabScreen(0,0,ofGetWindowWidth(), ofGetWindowHeight());
-	screen.saveImage("test_" + ofToString(ofGetFrameNum()) + ".png");
-	cout << "saved " << "test_" << ofToString(ofGetFrameNum()) << ".png" << endl;*/
+	string frame = ofToString(ofGetFrameNum());
+	if(frame.length() < 6) {
+		int add = 6 - frame.length();
+		for(int i = 0; i < add; i++) {
+			frame = ofToString(0) + frame;
+		}
+	}
+	screen.saveImage("test_" + frame + ".png");
+	cout << "saved " << "test_" << frame << ".png" << endl;*/
 }
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
