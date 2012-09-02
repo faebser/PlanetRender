@@ -167,7 +167,7 @@ class planetFbo : public ofFbo {
 			updatePoints();
 			generateAttraction();
 			this->begin();
-			ofClear(0, 0, 0, 0);
+			//ofClear(0, 0, 0, 0);
 			for(;it < end; ++it) {
 				ofPushStyle();
 					ofSetColor(66, 154, 66);
@@ -197,7 +197,7 @@ class planetFbo : public ofFbo {
 		void paintMeLines() {
 			vector<planetShape>::iterator it = shapes.begin(), end = shapes.end();
 			ofSetColor(255);
-			ofClear(0,0,0,0);
+			//ofClear(0,0,0,0);
 			updatePoints();
 			this->begin();
 			for(;it < end; ++it) {

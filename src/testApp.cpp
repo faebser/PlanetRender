@@ -146,10 +146,11 @@ void testApp::update(){
 //--------------------------------------------------------------
 void testApp::draw(){
 	vector<ofVec3f>::iterator it = stars.begin(), end = stars.end();
+	ofEnableAlphaBlending();
 	ofSetColor(255);
 	for(; it != end; ++it) {
 		it->set(it->x + ofRandom(-0.01,0.01), it->y + ofRandom(-0.01,0.01), 0);
-		ofCircle((*it), 0.8);
+		ofCircle(it->x,it->y, 0.8);
 	}
 
 	fbo3.draw(0, 0);
@@ -161,7 +162,7 @@ void testApp::draw(){
 
 	//rotate sphere over time
 	ofRotateY(ofGetFrameNum()*0.1); // super idee das mached mir so :D
-	ofEnableAlphaBlending();
+
 	glEnable(GL_DEPTH_TEST); //enable depth comparisons and update the depth buffer
 
 	//bind and draw texture
