@@ -1,29 +1,44 @@
 #include "testApp.h"
-#define AMOUNT 100
 
 //--------------------------------------------------------------
 void testApp::setup(){
 	ofBackground(0,0,0);
 
 	ofSetFrameRate(24);
-	ofSetVerticalSync(true);
-	ofDisableArbTex(); //needed for textures to work with gluSphere
 
-	int xMax = 1024;
-	int yMax = 768;
-	res = 10;
 
-	fbo3.allocate(xMax, yMax, GL_RGBA, 4);
-	fbo4.allocate(xMax, yMax, GL_RGBA, 4);
-	fbo4.setType("line");
+	int xMax = 1024, yMax = 768;
+	fbo.allocate(xMax, yMax, GL_RGBA, 2);
+	fbo.setType("line");
+	fbo.setColor(ofColor(40, 107, 119));
+	fbo.generateShapes(20);
+	fbo.paintMe();
+
+	fbo1.allocate(xMax, yMax, GL_RGBA, 2);
+	fbo1.setType("line");
+	fbo1.setColor(ofColor(123, 155, 160));
+	fbo1.generateShapes(35);
+	fbo1.paintMe();
+
+	fbo2.allocate(xMax, yMax, GL_RGBA, 2);
+	fbo2.setType("line");
+	fbo2.setColor(ofColor(67, 140, 142));
+	fbo2.generateShapes(15);
+	fbo2.paintMe();
+
+	fbo3.allocate(xMax, yMax, GL_RGBA, 2);
 	fbo3.setType("line");
-	fbo4.setColor(ofColor(0, 255, 56));
-	fbo3.setColor(ofColor(255, 141, 68));
-	fbo4.generateShapes(20);
-	fbo3.generateShapes(20);
-	fbo4.paintMe();
+	fbo3.setColor(ofColor(73, 103, 104));
+	fbo3.generateShapes(10);
 	fbo3.paintMe();
 
+	fbo4.allocate(xMax, yMax, GL_RGBA, 2);
+	fbo4.setType("line");
+	fbo4.setColor(ofColor(3, 117, 165));
+	fbo4.generateShapes(20);
+	fbo4.paintMe();
+
+	// STARS
 	float x = 1, y = 1;
 	for(int i = 0; i < 100; i++) {
 		x = x + ofGetWindowWidth() / 9;
@@ -35,7 +50,7 @@ void testApp::setup(){
 	}
 
 	vector<ofVec3f>::iterator it = stars.begin(), end = stars.end();
-	ofSetColor(255);
+	ofSetColor(245);
 	int rounds = 1000;
 	for(int i = 0; i < rounds; i++) {
 		for(; it != end; ++it) {
@@ -45,99 +60,20 @@ void testApp::setup(){
 		it = stars.begin();
 	}
 
-	//anderer planet
-	float angle = ofDegToRad(360/10);
-	for(int i = 0; i < 10; i++) {
-		float x = cos(angle * i) * 25;
-		float y = sin(angle * i) * 25;
-		vertexPoints[i] = ofPoint(x,y);
-	}
-	center.set(12,12);
-
 	// Point lights emit light in all directions //
 	// set the diffuse color, color reflected from the light source //
-	pointLight.setDiffuseColor( ofColor(249, 245, 224));
-	lightPos = ofVec3f(800, 34, 545);
-	pointLight.setPosition(lightPos);
+	sun.setDiffuseColor( ofColor(249, 245, 224));
+
+	sunPos = ofVec3f(215, 964, 1100);
+	sun.setPosition(sunPos);
 
 	// specular color, the highlight/shininess color //
-	pointLight.setSpecularColor( ofColor(255.f, 255.f, 0.f));
-	pointLight.setPointLight();
-	/*fbo1.allocate(xMax, yMax, GL_RGBA, 4);
-	fbo2.allocate(xMax, yMax, GL_RGBA, 4);
-	//map.allocate(2048, 1024, OF_IMAGE_GRAYSCALE);
+	sun.setSpecularColor( ofColor(255.f, 255.f, 0.f));
+	sun.setPointLight();
 
-	//gasplanet
-	int max = xMax * yMax;
-	float xNoise = 0, yNoise = 0;
-	// gas planet = yInc = 0.1 xInc = 0.0001
-	brighntess = new int[max];
-	yIncrement = 0.008, xIncrement = 0.008;*/
-
-	/*fbo.begin();
-		for(int y = 0; y < yMax; y++) {
-			yNoise = 0;
-			xNoise += xIncrement;
-			for(int x = 0 ; x < xMax; x++) {
-				yNoise += yIncrement;
-				//brighntess[x+y] = (int)(255 * ofRandomuf());
-				ofSetColor(ofNoise(xNoise, yNoise)*240);
-				ofRect(x, y, 1, 1);
-			}
-		}
-	fbo.end();*/
-
-
-
-	/*
-	fbo.begin();
-		for(int y = 0; y < yMax; y++) {
-			yNoise = 0;
-			xNoise += xIncrement;
-			for(int x = 0 ; x < xMax; x++) {
-				yNoise += yIncrement;
-				float brig = ofNoise(xNoise, yNoise)*240;
-				if(brig > 100 && brig < 150) {
-					ofSetColor(142, 109, 86, 100);
-				}
-				else {
-					ofSetColor(0, 0, 0, 0);
-				}
-				ofRect(x, y, 1, 1);
-			}
-		}
-	fbo.end();
-	fbo1.begin();
-			for(int y = 0; y < yMax; y++) {
-				yNoise = 0;
-				xNoise += xIncrement;
-				for(int x = 0 ; x < xMax; x++) {
-					yNoise += yIncrement;
-					float brig = ofNoise(xNoise, yNoise)*240;
-					if(brig < 100) {
-						ofSetColor(99, 69, 39, 100);
-						ofRect(x, y, 1, 1);
-					}
-
-				}
-			}
-	fbo1.end();
-	fbo2.begin();
-				for(int y = 0; y < yMax; y++) {
-					yNoise = 0;
-					xNoise += xIncrement;
-					for(int x = 0 ; x < xMax; x++) {
-						yNoise += yIncrement;
-						float brig = ofNoise(xNoise, yNoise)*240;
-						if(brig > 150) {
-							ofSetColor(51, 41, 32, 100);
-							ofRect(x, y, 1, 1);
-						}
-
-					}
-				}
-	fbo2.end();*/
+	ofDisableArbTex(); //needed for textures to work with gluSphere
 }
+
 //--------------------------------------------------------------
 void testApp::update(){
 
@@ -145,51 +81,72 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-	vector<ofVec3f>::iterator it = stars.begin(), end = stars.end();
 	ofEnableAlphaBlending();
+	ofEnableLighting();
+	sun.enable();
+
+	vector<ofVec3f>::iterator it = stars.begin(), end = stars.end();
+
 	ofSetColor(255);
 	for(; it != end; ++it) {
 		it->set(it->x + ofRandom(-0.01,0.01), it->y + ofRandom(-0.01,0.01), 0);
 		ofCircle(it->x,it->y, 0.8);
 	}
 
-	fbo3.draw(0, 0);
-	ofEnableLighting();
-	pointLight.enable();
 
-	//change origin to center
 	ofTranslate(ofGetWidth()/2, ofGetHeight()/2, 0);
 
 	//rotate sphere over time
-	ofRotateY(ofGetFrameNum()*0.1); // super idee das mached mir so :D
+	ofRotateY(ofGetFrameNum()*-0.3); // super idee das mached mir so :D
 
 	glEnable(GL_DEPTH_TEST); //enable depth comparisons and update the depth buffer
+
+
+	ofSetColor(28, 220, 255);
+	ofSphere(70);
 
 	//bind and draw texture
 	glMatrixMode(GL_TEXTURE);
 	glPushMatrix();
-	ofScale(fbo3.getWidth(), fbo3.getHeight());
+	ofScale(fbo.getWidth(), fbo.getHeight());
 	glMatrixMode(GL_MODELVIEW);
-	ofSetColor(184, 114, 32);
-	ofFill();
-	ofSphere(198);
-	ofSetColor(255); // IMPORTANT!!!
-	fbo3.getTextureReference().bind();
-	ofSphere(200);
-	fbo3.getTextureReference().unbind();
-	ofSetColor(255);
-	fbo4.getTextureReference().bind();
-	ofRotateY(90);
-	ofSphere(206);
-	fbo4.getTextureReference().unbind();
+
+		ofSetColor(255); // IMPORTANT!!!
+		fbo.getTextureReference().bind();
+		ofRotateY(-20);
+		ofSphere(71);
+		fbo.getTextureReference().unbind();
+
+		fbo1.getTextureReference().bind();
+		ofRotateY(180);
+		ofSphere(72);
+		fbo1.getTextureReference().unbind();
+
+		fbo2.getTextureReference().bind();
+		ofRotateY(25);
+		ofSphere(75);
+		fbo2.getTextureReference().unbind();
+
+		fbo3.getTextureReference().bind();
+		ofRotateY(-10.2);
+		ofSphere(77);
+		fbo3.getTextureReference().unbind();
+
+		fbo4.getTextureReference().bind();
+		ofRotateY(-45);
+		ofSphere(80);
+		fbo4.getTextureReference().unbind();
+
 	glMatrixMode(GL_TEXTURE);
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
-	//fbo.draw(0,0);
 	glDisable(GL_DEPTH_TEST);
+
+
 	ofDisableAlphaBlending();
 	ofDisableLighting();
-	/*ofImage screen;
+
+	ofImage screen;
 	screen.grabScreen(0,0,ofGetWindowWidth(), ofGetWindowHeight());
 	string frame = ofToString(ofGetFrameNum());
 	if(frame.length() < 6) {
@@ -198,104 +155,47 @@ void testApp::draw(){
 			frame = ofToString(0) + frame;
 		}
 	}
-	screen.saveImage("test_" + frame + ".png");
-	cout << "saved " << "test_" << frame << ".png" << endl;*/
+	screen.saveImage("pod2_" + frame + ".png");
+	cout << "saved " << "pod2_" << frame << ".png" << endl;
 }
+
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
-	if(key == 'a') {
-		fbo3.paintMe();
-//		fbo.begin();
-//			ofTranslate(fbo.getWidth() / 2, fbo.getHeight() / 2);
-//			ofClear(255, 255, 255, 0);
-//			//grow
-//			for (int r = 0; r < 20; r++) {
-//				for(int i = 0; i < res; i++) {
-//					vertexPoints[i].set(vertexPoints[i].x + ofRandom(-1, 1), vertexPoints[i].y + ofRandom(-1, 1));
-//				}
-//			}
-//			center.set(center.x + ofRandom(-3,3), center.y + ofRandom(-2, 2));
-//			ofSetColor(31, 94, 31, 255);
-//			ofBeginShape();
-//				ofCurveVertex(vertexPoints[res - 1]);
-//				for(int i = 0; i < res; i++) {
-//					ofCurveVertex(vertexPoints[i]);
-//					//ofSetColor(255, 0 ,0);
-//					//ofEllipse(vertexPoints[i], 5, 5);
-//				}
-//				ofCurveVertex(vertexPoints[1]);
-//			ofEndShape();
-//			ofNoFill();
-//			ofEnableSmoothing();
-//				ofBeginShape();
-//					ofCurveVertex(vertexPoints[res - 1]);
-//					for(int i = 0; i < res; i++) {
-//						ofCurveVertex(vertexPoints[i]);
-//						//ofSetColor(255, 0 ,0);
-//						//ofEllipse(vertexPoints[i], 5, 5);
-//					}
-//					ofCurveVertex(vertexPoints[1]);
-//				ofEndShape();
-//			ofDisableSmoothing();
-//		fbo.end();
-	}
-	else if(key == 's') {
-		for (int r = 0; r < 20; r++) {
-			for(int i = 0; i < res; i++) {
-				ofPoint growVec;
-				growVec =  vertexPoints[i] - center;
-				vertexPoints[i] += growVec.normalized()*0.5;
-			}
-		}
-	}
-	else if(key == 'q') {
-		for (int r = 0; r < 20; r++) {
-			for(int i = 0; i < res; i++) {
-				ofPoint growVec;
-				growVec =  vertexPoints[i] - center;
-				vertexPoints[i] -= growVec.normalized()*0.5;
-			}
-		}
-	}
-	else if(key == 'w') {
-		xIncrement -= 0.0001;
-		cout << ofToString(xIncrement) << endl;
-	}
-	else if (key == OF_KEY_UP) {
-		lightPos.x++;
-		pointLight.setPosition(lightPos);
-		cout << "x-> " << lightPos.x << " y-> " << lightPos.y << " z-> " << lightPos.z << endl;
-	}
-	else if (key == OF_KEY_DOWN) {
-		lightPos.x--;
-		pointLight.setPosition(lightPos);
-		cout << "x-> " << lightPos.x << " y-> " << lightPos.y << " z-> " << lightPos.z << endl;
-	}
-	else if (key == OF_KEY_LEFT) {
-		lightPos.y++;
-		pointLight.setPosition(lightPos);
-		cout << "x-> " << lightPos.x << " y-> " << lightPos.y << " z-> " << lightPos.z << endl;
-	}
-	else if (key == OF_KEY_RIGHT) {
-		lightPos.y--;
-		pointLight.setPosition(lightPos);
-		cout << "x-> " << lightPos.x << " y-> " << lightPos.y << " z-> " << lightPos.z << endl;
-	}
-	else if (key == 'o') {
-		lightPos.z++;
-		pointLight.setPosition(lightPos);
-		cout << "x-> " << lightPos.x << " y-> " << lightPos.y << " z-> " << lightPos.z << endl;
-	}
-	else if (key == 'l') {
-		lightPos.z--;
-		pointLight.setPosition(lightPos);
-		cout << "x-> " << lightPos.x << " y-> " << lightPos.y << " z-> " << lightPos.z << endl;
-	}
+
 }
 
 //--------------------------------------------------------------
 void testApp::keyReleased(int key){
-
+	 if (key == OF_KEY_UP) {
+		sunPos.x += 5;
+		sun.setPosition(sunPos);
+		cout << "x-> " << sunPos.x << " y-> " << sunPos.y << " z-> " << sunPos.z << endl;
+	}
+	else if (key == OF_KEY_DOWN) {
+		sunPos.x -= 5;
+		sun.setPosition(sunPos);
+		cout << "x-> " << sunPos.x << " y-> " << sunPos.y << " z-> " << sunPos.z << endl;
+	}
+	else if (key == OF_KEY_LEFT) {
+		sunPos.y += 5;
+		sun.setPosition(sunPos);
+		cout << "x-> " << sunPos.x << " y-> " << sunPos.y << " z-> " << sunPos.z << endl;
+	}
+	else if (key == OF_KEY_RIGHT) {
+		sunPos.y -= 5;
+		sun.setPosition(sunPos);
+		cout << "x-> " << sunPos.x << " y-> " << sunPos.y << " z-> " << sunPos.z << endl;
+	}
+	else if (key == 'o') {
+		sunPos.z += 5;
+		sun.setPosition(sunPos);
+		cout << "x-> " << sunPos.x << " y-> " << sunPos.y << " z-> " << sunPos.z << endl;
+	}
+	else if (key == 'l') {
+		sunPos.z -= 5;
+		sun.setPosition(sunPos);
+		cout << "x-> " << sunPos.x << " y-> " << sunPos.y << " z-> " << sunPos.z << endl;
+	}
 }
 
 //--------------------------------------------------------------
